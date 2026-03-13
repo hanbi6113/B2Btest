@@ -9,6 +9,9 @@ const concepts = [
   { id: 5, href: "/concept-5" },
   { id: 6, href: "/concept-6" },
   { id: 7, href: "/concept-7" },
+  { id: 8, href: "/concept-8" },
+  { id: 9, href: "/concept-9" },
+  // { id: 10, href: "/concept-10" },
 ];
 
 export default function HomePage() {

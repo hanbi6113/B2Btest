@@ -1,397 +1,375 @@
-// app/concept-7/page.tsx
-"use client";
-
 import Link from "next/link";
-import { useMemo, useState } from "react";
 
-type PackageItem = {
-  id: string;
-  category: string;
-  title: string;
-  desc: string;
-  preview: string;
-  mood: string;
-  deliverables: string[];
-  keywords: string[];
-  accent: string;
-  accentSoft: string;
-  accentBorder: string;
-  accentBg: string;
-  panelBg: string;
-  pageGlow: string;
-};
-
-const packages: PackageItem[] = [
+const coreValues = [
   {
-    id: "game-launch",
-    category: "GAME",
-    title: "게임 IP 런칭 티저 패키지",
-    desc: "신작 공개, 사전예약, 출시 초반 캠페인에 필요한 핵심 티저 자산을 패키지 형태로 제공하는 상품입니다. Vision3의 AI-native 제작 파이프라인과 연출 디렉션을 결합하여, 세계관 전달력과 집행 속도를 동시에 확보합니다.",
-    preview: "Launch Teaser Preview",
-    mood: "세계관 · 임팩트 · 런칭 모멘텀",
-    deliverables: ["메인 티저 필름", "사전예약 숏폼", "런칭 컷다운", "키 비주얼 모션"],
-    keywords: ["impact", "launch", "worldbuilding"],
-    accent: "text-violet-200",
-    accentSoft: "text-violet-200/70",
-    accentBorder: "border-violet-300/20",
-    accentBg: "bg-violet-300/10",
-    panelBg:
-      "bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.32),transparent_34%),linear-gradient(180deg,#0b1020_0%,#0a1120_100%)]",
-    pageGlow:
-      "bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.16),transparent_22%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.12),transparent_20%),linear-gradient(180deg,#05070d_0%,#0a0f18_100%)]",
+    title: "Story to Screen",
+    desc: "웹툰과 소설 같은 원작 서사를 실사형 영상 기획 언어로 전환하는 Vision3의 핵심 방향입니다.",
   },
   {
-    id: "game-liveops",
-    category: "GAME",
-    title: "게임 라이브옵스 / 업데이트 패키지",
-    desc: "업데이트·이벤트·운영 공지성 영상 자산을 월 단위로 안정 공급하는 패키지입니다. 템플릿 기반 반복 제작 구조를 통해 운영팀의 콘텐츠 생산 부담과 납기 리스크를 줄입니다.",
-    preview: "LiveOps Update Preview",
-    mood: "반복 운영 · 빠른 납기 · 안정 공급",
-    deliverables: ["업데이트 공지 영상", "이벤트 예고 숏폼", "운영형 모션 템플릿", "월간 반복 자산"],
-    keywords: ["repeatable", "update", "template"],
-    accent: "text-cyan-200",
-    accentSoft: "text-cyan-200/70",
-    accentBorder: "border-cyan-300/20",
-    accentBg: "bg-cyan-300/10",
-    panelBg:
-      "bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.28),transparent_34%),linear-gradient(180deg,#07131d_0%,#0a1720_100%)]",
-    pageGlow:
-      "bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.14),transparent_22%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.10),transparent_20%),linear-gradient(180deg,#05070d_0%,#0a1018_100%)]",
+    title: "AI-native Production",
+    desc: "빠른 시각화와 반복 제작 효율을 기반으로 실제 비즈니스 일정에 맞는 제작 구조를 제공합니다.",
   },
   {
-    id: "beauty",
-    category: "BEAUTY",
-    title: "뷰티 신제품 런칭 숏폼 패키지",
-    desc: "신제품 런칭 초기에 필요한 핵심 숏폼 자산을 빠르게 구성하는 패키지입니다. 브랜드 무드와 제품 USP를 균형 있게 반영하여 SNS 및 광고 집행 준비 시간을 줄입니다.",
-    preview: "Beauty Launch Preview",
-    mood: "제품 무드 · 감도 · 숏폼 전개",
-    deliverables: ["런칭 숏폼", "제품 USP 컷", "SNS 광고형 영상", "브랜드 무드 클립"],
-    keywords: ["beauty", "mood", "shortform"],
-    accent: "text-pink-200",
-    accentSoft: "text-pink-200/70",
-    accentBorder: "border-pink-300/20",
-    accentBg: "bg-pink-300/10",
-    panelBg:
-      "bg-[radial-gradient(circle_at_top_left,rgba(244,114,182,0.30),transparent_34%),linear-gradient(180deg,#170a14_0%,#1b0d18_100%)]",
-    pageGlow:
-      "bg-[radial-gradient(circle_at_top_left,rgba(244,114,182,0.16),transparent_22%),radial-gradient(circle_at_top_right,rgba(251,191,36,0.08),transparent_20%),linear-gradient(180deg,#05070d_0%,#0c0b14_100%)]",
-  },
-  {
-    id: "edu",
-    category: "EDU",
-    title: "이러닝 · 에듀 관련 패키지",
-    desc: "교육 서비스 홍보와 실제 학습용 콘텐츠 제작을 목적별로 분리 설계한 패키지입니다. 수강자 유입용 홍보 자산부터 마이크로러닝 영상 모듈까지 단계적으로 구성할 수 있습니다.",
-    preview: "Education Content Preview",
-    mood: "명확한 전달 · 구조화 · 학습 효율",
-    deliverables: ["홍보형 영상", "학습 모듈 영상", "강의형 반복 템플릿", "마이크로러닝 클립"],
-    keywords: ["clarity", "learning", "module"],
-    accent: "text-sky-200",
-    accentSoft: "text-sky-200/70",
-    accentBorder: "border-sky-300/20",
-    accentBg: "bg-sky-300/10",
-    panelBg:
-      "bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.30),transparent_34%),linear-gradient(180deg,#08131d_0%,#091821_100%)]",
-    pageGlow:
-      "bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.14),transparent_22%),radial-gradient(circle_at_top_right,rgba(16,185,129,0.08),transparent_20%),linear-gradient(180deg,#05070d_0%,#091019_100%)]",
-  },
-  {
-    id: "fashion",
-    category: "FASHION",
-    title: "패션 시즌 룩북 필름 패키지",
-    desc: "시즌 컬렉션의 무드, 실루엣, 질감, 브랜드 스토리를 전달하는 룩북 영상 패키지입니다. 룩북·캠페인·소셜에서 함께 활용 가능한 파생 자산까지 포함할 수 있습니다.",
-    preview: "Lookbook Film Preview",
-    mood: "실루엣 · 질감 · 시즌 무드",
-    deliverables: ["룩북 필름", "캠페인 컷다운", "소셜 클립", "브랜드 스토리 무드컷"],
-    keywords: ["lookbook", "texture", "season"],
-    accent: "text-amber-200",
-    accentSoft: "text-amber-200/70",
-    accentBorder: "border-amber-300/20",
-    accentBg: "bg-amber-300/10",
-    panelBg:
-      "bg-[radial-gradient(circle_at_top_left,rgba(251,191,36,0.28),transparent_34%),linear-gradient(180deg,#171107_0%,#1b1408_100%)]",
-    pageGlow:
-      "bg-[radial-gradient(circle_at_top_left,rgba(251,191,36,0.14),transparent_22%),radial-gradient(circle_at_top_right,rgba(244,114,182,0.08),transparent_20%),linear-gradient(180deg,#05070d_0%,#100d0b_100%)]",
-  },
-  {
-    id: "ent",
-    category: "ENT",
-    title: "엔터 · 웹드라마 / 영화 패키지",
-    desc: "웹드라마와 영화의 티저·예고편·프로모션 영상 자산을 패키지형으로 제공하는 상품입니다. 공개 일정에 맞춰 메인 예고 자산과 파생 프로모션 자산을 함께 구성합니다.",
-    preview: "Entertainment Trailer Preview",
-    mood: "서사 · 예고 · 공개 전 집중도",
-    deliverables: ["티저", "메인 예고편", "프로모션 컷다운", "공개 일정형 자산"],
-    keywords: ["trailer", "narrative", "promotion"],
-    accent: "text-rose-200",
-    accentSoft: "text-rose-200/70",
-    accentBorder: "border-rose-300/20",
-    accentBg: "bg-rose-300/10",
-    panelBg:
-      "bg-[radial-gradient(circle_at_top_left,rgba(251,113,133,0.28),transparent_34%),linear-gradient(180deg,#15090d_0%,#190c11_100%)]",
-    pageGlow:
-      "bg-[radial-gradient(circle_at_top_left,rgba(251,113,133,0.14),transparent_22%),radial-gradient(circle_at_top_right,rgba(168,85,247,0.10),transparent_20%),linear-gradient(180deg,#05070d_0%,#100a12_100%)]",
-  },
-  {
-    id: "finance",
-    category: "FINANCE",
-    title: "금융 · 보험 패키지",
-    desc: "금융·보험사의 브랜딩, 상품안내, 고객 커뮤니케이션 목적에 맞춰 설계된 패키지입니다. 표현 정확성과 준법 검토를 고려한 진행 구조로 실무 수정 부담을 줄입니다.",
-    preview: "Finance Communication Preview",
-    mood: "정확성 · 신뢰 · 안정적인 전달",
-    deliverables: ["브랜딩 영상", "상품 안내 영상", "고객 커뮤니케이션 영상", "설명형 자산"],
-    keywords: ["trust", "accuracy", "compliance"],
-    accent: "text-emerald-200",
-    accentSoft: "text-emerald-200/70",
-    accentBorder: "border-emerald-300/20",
-    accentBg: "bg-emerald-300/10",
-    panelBg:
-      "bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.26),transparent_34%),linear-gradient(180deg,#071710_0%,#0a1a15_100%)]",
-    pageGlow:
-      "bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.14),transparent_22%),radial-gradient(circle_at_top_right,rgba(56,189,248,0.08),transparent_20%),linear-gradient(180deg,#05070d_0%,#09110f_100%)]",
-  },
-  {
-    id: "hr",
-    category: "HR",
-    title: "인사 교육 영상 패키지",
-    desc: "인사·교육팀의 반복 제작 수요에 맞춘 내부 교육 영상 패키지입니다. 온보딩·필수교육·직무교육·리더십 교육을 템플릿화하여 빠르고 일관성 있게 제작할 수 있습니다.",
-    preview: "HR Training Preview",
-    mood: "반복 교육 · 일관성 · 내부 운영",
-    deliverables: ["온보딩 영상", "필수 교육 템플릿", "직무교육 영상", "리더십 교육 자산"],
-    keywords: ["internal", "training", "consistency"],
-    accent: "text-teal-200",
-    accentSoft: "text-teal-200/70",
-    accentBorder: "border-teal-300/20",
-    accentBg: "bg-teal-300/10",
-    panelBg:
-      "bg-[radial-gradient(circle_at_top_left,rgba(45,212,191,0.28),transparent_34%),linear-gradient(180deg,#071514_0%,#0a1818_100%)]",
-    pageGlow:
-      "bg-[radial-gradient(circle_at_top_left,rgba(45,212,191,0.14),transparent_22%),radial-gradient(circle_at_top_right,rgba(14,165,233,0.08),transparent_20%),linear-gradient(180deg,#05070d_0%,#091012_100%)]",
-  },
-  {
-    id: "healthcare",
-    category: "HEALTHCARE",
-    title: "헬스케어 관련 패키지",
-    desc: "헬스케어 서비스·기관·솔루션의 소개·안내·설명 목적에 맞춘 영상 패키지입니다. 정확성과 신뢰성을 우선으로 설계하여 전문가 검토가 필요한 환경에서도 안정적인 제작 프로세스를 제공합니다.",
-    preview: "Healthcare Content Preview",
-    mood: "정확성 · 설명력 · 전문 검토 대응",
-    deliverables: ["소개 영상", "안내형 영상", "설명형 콘텐츠", "전문 검토 대응 자산"],
-    keywords: ["care", "precision", "expert review"],
-    accent: "text-blue-200",
-    accentSoft: "text-blue-200/70",
-    accentBorder: "border-blue-300/20",
-    accentBg: "bg-blue-300/10",
-    panelBg:
-      "bg-[radial-gradient(circle_at_top_left,rgba(96,165,250,0.28),transparent_34%),linear-gradient(180deg,#08111e_0%,#091421_100%)]",
-    pageGlow:
-      "bg-[radial-gradient(circle_at_top_left,rgba(96,165,250,0.14),transparent_22%),radial-gradient(circle_at_top_right,rgba(16,185,129,0.08),transparent_20%),linear-gradient(180deg,#05070d_0%,#091019_100%)]",
+    title: "High-end Direction",
+    desc: "툴처럼 보이되 결과물은 제작사처럼 보이게 만드는 고급스러운 연출 감도와 브랜드 완성도를 지향합니다.",
   },
 ];
 
-export default function Concept7Page() {
-  const [selectedId, setSelectedId] = useState(packages[0].id);
+const workflow = [
+  {
+    step: "01",
+    title: "원작 분위기 분석",
+    desc: "세계관, 캐릭터 감정선, 브랜드 포인트를 먼저 정리해 실사형 전환의 기준을 설계합니다.",
+  },
+  {
+    step: "02",
+    title: "실사형 톤 재구성",
+    desc: "원작의 결을 유지하면서도 실제 캠페인과 영상 언어에 맞는 톤으로 재구성합니다.",
+  },
+  {
+    step: "03",
+    title: "영상 콘셉트 설계",
+    desc: "티저, 숏폼, 트레일러, 설명형 자산 등 목적에 맞는 구조로 기획합니다.",
+  },
+  {
+    step: "04",
+    title: "프로모션 자산 확장",
+    desc: "핵심 영상만이 아니라 파생 컷다운과 운영형 콘텐츠까지 연결합니다.",
+  },
+];
 
-  const selected = useMemo(
-    () => packages.find((item) => item.id === selectedId) ?? packages[0],
-    [selectedId]
-  );
+const sectors = [
+  "GAME",
+  "BEAUTY",
+  "EDU",
+  "FASHION",
+  "ENT",
+  "FINANCE",
+  "HR",
+  "HEALTHCARE",
+];
 
+export default function Concept7BusinessPage() {
   return (
-    <main className={`min-h-screen text-white ${selected.pageGlow}`}>
-      <header className="sticky top-0 z-30 border-b border-white/10 bg-[#05070d]/72 backdrop-blur">
-        <div className="mx-auto grid max-w-7xl grid-cols-[auto_1fr_auto] items-center px-6 py-4">
-          <div className="justify-self-start">
-            <Link
-              href="/"
-              className="text-sm text-white/65 transition hover:text-white"
-            >
-              home
-            </Link>
-          </div>
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.14),transparent_20%),radial-gradient(circle_at_top_right,rgba(34,211,238,0.10),transparent_20%),linear-gradient(180deg,#05070d_0%,#0a0f18_100%)] text-white">
+      <Link
+        href="/"
+        className="fixed left-4 top-4 z-50 inline-flex items-center justify-center rounded-full border border-white/12 bg-[#0b1120]/78 px-4 py-2 text-sm text-white/78 shadow-[0_18px_50px_rgba(0,0,0,0.35)] backdrop-blur-md transition hover:-translate-y-0.5 hover:text-white"
+      >
+        home
+      </Link>
 
-          <nav className="hidden items-center justify-center gap-8 md:flex">
-            <a
-              href="#business"
-              className="text-sm text-white/65 transition hover:text-white"
+      <header className="sticky top-0 z-30 border-b border-white/10 bg-[#05070d]/72 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+          <Link href="/concept-7" className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 shadow-[0_10px_30px_rgba(0,0,0,0.28)]">
+              <span className="bg-gradient-to-r from-violet-200 via-cyan-200 to-blue-200 bg-clip-text text-sm font-black text-transparent">
+                V3
+              </span>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.24em] text-white/42">
+                premium ai production
+              </p>
+              <p className="text-base font-semibold tracking-[-0.03em] text-white">
+                Vision3
+              </p>
+            </div>
+          </Link>
+
+          <nav className="hidden items-center gap-8 md:flex">
+            <Link
+              href="/concept-7"
+              className="text-sm text-white transition hover:text-white"
             >
               사업 소개
-            </a>
-            <a
-              href="#packages"
-              className="text-sm text-white/65 transition hover:text-white"
+            </Link>
+            <Link
+              href="/concept-7/packages"
+              className="text-sm text-white/62 transition hover:text-white"
             >
               패키지 소개
-            </a>
-            <a
-              href="#support"
-              className="text-sm text-white/65 transition hover:text-white"
+            </Link>
+            <Link
+              href="/concept-7/support"
+              className="text-sm text-white/62 transition hover:text-white"
             >
               고객센터
-            </a>
+            </Link>
           </nav>
 
-          <div className="justify-self-end">
-            <span className="rounded-full border border-white/12 bg-white/8 px-4 py-2 text-xs uppercase tracking-[0.2em] text-white/80">
-              concept 7
-            </span>
-          </div>
+          <span className="rounded-full border border-white/12 bg-white/8 px-4 py-2 text-xs uppercase tracking-[0.2em] text-white/80">
+            concept 7
+          </span>
         </div>
       </header>
 
-      <section id="business" className="border-b border-white/10">
-        <div className="mx-auto max-w-7xl px-6 py-16">
-          <p className={`text-xs uppercase tracking-[0.28em] ${selected.accentSoft}`}>
-            Vision3 B2B
-          </p>
+      <section className="border-b border-white/10">
+        <div className="mx-auto grid max-w-7xl gap-12 px-6 py-20 lg:grid-cols-[1fr_1fr] lg:items-center">
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-violet-200/72">
+              Vision3 B2B
+            </p>
 
-          <h1 className="mt-5 text-5xl font-semibold tracking-[-0.08em] text-white md:text-7xl">
-            business.vision3.ai
-          </h1>
+            <h1 className="mt-5 text-5xl font-semibold tracking-[-0.08em] text-white md:text-7xl xl:text-[5.2rem] xl:leading-[0.95]">
+              story IP를
+              <span className="block bg-gradient-to-r from-white via-violet-200 to-cyan-200 bg-clip-text text-transparent">
+                high-end visual asset로
+              </span>
+              확장하는 제작
+            </h1>
 
-          <p className="mt-7 max-w-3xl text-base leading-8 text-white/72 md:text-lg">
-            하나의 레이아웃 안에서 산업군별 패키지에 맞춰 무드와 정보 구조가 전환되는
-            인터랙티브 비즈니스 시안입니다.
-          </p>
+            <p className="mt-8 max-w-3xl text-base leading-8 text-white/72 md:text-lg">
+              Vision3는 웹툰과 소설 같은 스토리 원작을 바탕으로 실사형 영상
+              콘셉트, 티저, 숏폼, 프로모션, 운영형 파생 자산까지 연결하는
+              하이엔드 AI 제작 파트너입니다.
+            </p>
 
-          <div id="packages" className="mt-10 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {packages.map((item) => {
-              const active = item.id === selectedId;
-
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => setSelectedId(item.id)}
-                  className={`rounded-[14px] border px-3 py-2 text-left transition ${
-                    active
-                      ? `${selected.accentBorder} ${selected.accentBg}`
-                      : "border-white/10 bg-white/5 hover:border-white/18 hover:bg-white/8"
-                  }`}
+            <div className="mt-8 flex flex-wrap gap-3">
+              {[
+                "story IP",
+                "live-action direction",
+                "AI-native workflow",
+                "premium production",
+              ].map((item) => (
+                <span
+                  key={item}
+                  className="rounded-full border border-white/10 bg-white/6 px-4 py-2 text-sm text-white/82"
                 >
-                  <p
-                    className={`text-[9px] uppercase tracking-[0.16em] ${
-                      active ? selected.accentSoft : "text-white/38"
-                    }`}
-                  >
-                    {item.category}
-                  </p>
+                  {item}
+                </span>
+              ))}
+            </div>
 
-                  <p
-                    className={`mt-1 text-[12px] font-medium leading-4 ${
-                      active ? "text-white" : "text-white/76"
-                    }`}
-                  >
-                    {item.title}
-                  </p>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-6 py-16">
-        <div className="grid gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:items-start">
-          <div className="space-y-6">
-            <div className="overflow-hidden rounded-[38px] border border-white/10 bg-white/6 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.42)]">
-              <div
-                className={`relative overflow-hidden rounded-[28px] border border-white/10 ${selected.panelBg}`}
+            <div className="mt-10 flex flex-wrap gap-3">
+              <Link
+                href="/concept-7/packages"
+                className="inline-flex items-center justify-center rounded-full border border-violet-300/16 bg-violet-300/10 px-6 py-3 text-sm font-medium text-violet-200 transition hover:-translate-y-0.5"
               >
-                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(0,0,0,0.20))]" />
-                <div className="relative flex aspect-[16/10] flex-col justify-between p-7 md:p-8">
-                  <div className="flex items-center justify-between">
-                    <span className={`rounded-full border border-white/12 bg-white/10 px-4 py-2 text-xs uppercase tracking-[0.2em] ${selected.accent}`}>
-                      {selected.category}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <span className="h-2.5 w-2.5 rounded-full bg-white/55" />
-                      <span className="h-2.5 w-2.5 rounded-full bg-white/25" />
-                      <span className="h-2.5 w-2.5 rounded-full bg-white/12" />
-                    </div>
-                  </div>
+                패키지 보기
+              </Link>
+              <Link
+                href="/concept-7/support"
+                className="inline-flex items-center justify-center rounded-full border border-white/12 bg-white/6 px-6 py-3 text-sm font-medium text-white/84 transition hover:-translate-y-0.5 hover:bg-white/8"
+              >
+                고객센터
+              </Link>
+            </div>
+          </div>
 
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <div className="h-px w-12 bg-white/18" />
-                      <p className={`text-xs uppercase tracking-[0.26em] ${selected.accentSoft}`}>
-                        preview mood
-                      </p>
-                    </div>
+          {/* Video Hero */}
+          <div className="relative">
+            <div className="absolute -inset-6 rounded-[40px] bg-[radial-gradient(circle_at_center,rgba(139,92,246,0.18),transparent_58%)] blur-2xl" />
+            <div className="relative overflow-hidden rounded-[36px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.03))] p-4 shadow-[0_30px_100px_rgba(0,0,0,0.46)]">
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.08),transparent_34%)]" />
 
-                    <p className={`text-2xl font-semibold tracking-[-0.04em] md:text-3xl ${selected.accent}`}>
-                      {selected.preview}
-                    </p>
+             <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[#05070d]">
+              <div className="absolute inset-0 z-10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(0,0,0,0.16))]" />
 
-                    <p className="max-w-md text-sm leading-7 text-white/68">
-                      {selected.mood}
-                    </p>
-                  </div>
-                </div>
+              <video
+                src="/videos/vid1.mp4"
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="relative aspect-[16/10] w-full object-cover"
+              />
+
+              <div className="pointer-events-none absolute inset-0 z-20 bg-[linear-gradient(to_top,rgba(3,6,12,0.28),rgba(3,6,12,0.06),rgba(255,255,255,0.02))]" />
+
+              <div className="absolute left-5 top-5 z-30 flex items-center gap-2">
+                <span className="rounded-full border border-violet-300/16 bg-violet-300/10 px-4 py-2 text-[11px] uppercase tracking-[0.2em] text-violet-200">
+                  featured reel
+                </span>
+                <span className="rounded-full border border-white/10 bg-black/20 px-4 py-2 text-[11px] uppercase tracking-[0.2em] text-white/68 backdrop-blur">
+                  live-action preview
+                </span>
               </div>
             </div>
 
-            <div className="rounded-[30px] border border-white/10 bg-white/5 p-6">
-              <div className="flex flex-wrap gap-3">
-                {selected.keywords.map((item) => (
-                  <span
-                    key={item}
-                    className={`rounded-full border px-4 py-2 text-sm ${selected.accentBorder} ${selected.accentBg} ${selected.accent}`}
-                  >
-                    {item}
+            {/* 영상 아래로 내린 설명 박스 */}
+            <div className="mt-4">
+              <div className="rounded-[24px] border border-white/10 bg-black/20 p-5 backdrop-blur-md">
+                <p className="text-xs uppercase tracking-[0.24em] text-violet-200/70">
+                  cinematic production system
+                </p>
+                <h2 className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-white md:text-3xl">
+                  Original Story
+                  <span className="block text-cyan-200">
+                    reimagined for premium rollout
                   </span>
+                </h2>
+                <p className="mt-4 max-w-xl text-sm leading-7 text-white/72">
+                  실사형 결과물, 티저 자산, 캠페인 확장, 파생 운영형
+                  콘텐츠까지 연결되는 Vision3의 creative production preview
+                </p>
+              </div>
+            </div>
+
+              <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                {[
+                  ["IP Analysis", "원작 감도 정리"],
+                  ["Direction Build", "실사형 톤 재구성"],
+                  ["Campaign Delivery", "집행형 자산 확장"],
+                ].map(([title, desc]) => (
+                  <div
+                    key={title}
+                    className="rounded-[22px] border border-white/10 bg-white/5 p-4"
+                  >
+                    <p className="text-xs uppercase tracking-[0.18em] text-white/42">
+                      {title}
+                    </p>
+                    <p className="mt-3 text-sm leading-6 text-white/82">{desc}</p>
+                  </div>
                 ))}
               </div>
             </div>
           </div>
+        </div>
+      </section>
 
-          <div className="rounded-[34px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))] p-7 md:p-8">
-            <p className={`text-xs uppercase tracking-[0.24em] ${selected.accentSoft}`}>
-              selected package
+      <section className="mx-auto max-w-7xl px-6 py-20">
+        <div className="grid gap-6 lg:grid-cols-[1.02fr_0.98fr]">
+          <div className="rounded-[34px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))] p-8 md:p-10">
+            <p className="text-xs uppercase tracking-[0.28em] text-violet-200/64">
+              business introduction
             </p>
-
-            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.05em] text-white md:text-4xl">
-              {selected.title}
+            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.05em] text-white md:text-5xl">
+              사업 소개
             </h2>
-
             <p className="mt-6 text-sm leading-8 text-white/72 md:text-base">
-              {selected.desc}
+              Vision3는 원작 IP를 단순히 영상화하는 것이 아니라, 실사형
+              결과물에 적합한 분위기와 감정선, 화면 언어를 다시 설계하는 데
+              초점을 둡니다. 웹툰·웹소설이 가진 팬덤과 세계관을 존중하면서도,
+              실제 영상 프로모션과 캠페인에 활용할 수 있는 비즈니스 친화적
+              결과물로 확장합니다.
+            </p>
+            <p className="mt-5 text-sm leading-8 text-white/72 md:text-base">
+              특히 공개 전 티저, 런칭 캠페인, 숏폼 광고, 브랜드 협업, 파생
+              자산처럼 속도와 일관성이 모두 중요한 환경에서 Vision3의
+              AI-native 제작 구조는 강한 효율을 제공합니다.
             </p>
 
-            <div className="mt-8 h-px w-full bg-white/10" />
-
-            <div className="mt-8 grid gap-3">
-              {selected.deliverables.map((item, index) => (
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+              {[
+                ["Original IP", "웹툰 · 소설 · 브랜드 스토리"],
+                ["Output Format", "티저 · 숏폼 · 안내형 · 운영형"],
+                ["Production Logic", "반복 제작 최적화 + 연출 디렉션"],
+                ["Business Goal", "런칭 효율 · 전달력 · 납기 안정성"],
+              ].map(([title, desc]) => (
                 <div
-                  key={item}
-                  className="flex items-center gap-4 rounded-[20px] border border-white/10 bg-white/6 px-5 py-4"
+                  key={title}
+                  className="rounded-[22px] border border-white/10 bg-white/5 p-5"
                 >
-                  <span className={`text-sm font-semibold ${selected.accent}`}>
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <span className="text-sm text-white/84">{item}</span>
+                  <p className="text-xs uppercase tracking-[0.18em] text-white/40">
+                    {title}
+                  </p>
+                  <p className="mt-3 text-sm text-white/84">{desc}</p>
                 </div>
               ))}
             </div>
           </div>
+
+          <div className="grid gap-6">
+            {coreValues.map((item, index) => (
+              <article
+                key={item.title}
+                className={`rounded-[28px] border p-6 ${
+                  index === 0
+                    ? "border-violet-300/16 bg-[linear-gradient(180deg,rgba(127,152,255,0.10),rgba(255,255,255,0.03))]"
+                    : index === 1
+                    ? "border-cyan-300/16 bg-[linear-gradient(180deg,rgba(86,177,255,0.10),rgba(255,255,255,0.03))]"
+                    : "border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))]"
+                }`}
+              >
+                <h3 className="text-xl font-semibold tracking-[-0.03em] text-white">
+                  {item.title}
+                </h3>
+                <p className="mt-3 text-sm leading-7 text-white/70">
+                  {item.desc}
+                </p>
+              </article>
+            ))}
+          </div>
         </div>
+      </section>
 
-        <div id="support" className="mt-8 rounded-[30px] border border-white/10 bg-white/5 px-6 py-5">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <section className="mx-auto max-w-7xl px-6 pb-20">
+        <div className="rounded-[34px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] p-8 md:p-10">
+          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className={`text-xs uppercase tracking-[0.22em] ${selected.accentSoft}`}>
-                current selection
+              <p className="text-xs uppercase tracking-[0.28em] text-violet-200/64">
+                workflow
               </p>
-              <p className="mt-2 text-lg font-semibold text-white">
-                {selected.title}
+              <h2 className="mt-4 text-3xl font-semibold tracking-[-0.05em] text-white md:text-5xl">
+                Vision3 Flow
+              </h2>
+              <p className="mt-5 max-w-2xl text-sm leading-8 text-white/72 md:text-base">
+                원작의 정체성을 유지하면서도 실사형 결과물과 실제 집행 환경에
+                맞게 재구성하는 Vision3의 기본 흐름입니다.
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-2">
-              <span className="rounded-full border border-white/10 bg-white/8 px-4 py-2 text-sm text-white/72">
-                {selected.category}
-              </span>
-              <span className={`rounded-full border px-4 py-2 text-sm ${selected.accentBorder} ${selected.accentBg} ${selected.accent}`}>
-                {selected.mood}
-              </span>
+            <Link
+              href="/concept-7/packages"
+              className="inline-flex items-center justify-center rounded-full border border-white/12 bg-white/6 px-5 py-3 text-sm font-medium text-white/84 transition hover:-translate-y-0.5 hover:bg-white/8"
+            >
+              패키지 전체 보기
+            </Link>
+          </div>
+
+          <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {workflow.map((item) => (
+              <div
+                key={item.step}
+                className="rounded-[24px] border border-white/10 bg-white/5 p-5"
+              >
+                <p className="text-xs uppercase tracking-[0.2em] text-violet-200/64">
+                  {item.step}
+                </p>
+                <p className="mt-3 text-base font-medium text-white">{item.title}</p>
+                <p className="mt-3 text-sm leading-7 text-white/68">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 pb-24">
+        <div className="rounded-[34px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.18),transparent_24%),linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))] p-8 md:p-10">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.24em] text-violet-200/64">
+                coverage
+              </p>
+              <h2 className="mt-4 text-3xl font-semibold tracking-[-0.05em] text-white md:text-4xl">
+                산업군에 맞춰 같은 구조가
+                <br className="hidden md:block" />
+                다른 무드로 전환됩니다
+              </h2>
+              <p className="mt-5 max-w-2xl text-sm leading-8 text-white/72 md:text-base">
+                게임, 뷰티, 에듀, 패션, 엔터, 금융, HR, 헬스케어 등 목적과
+                산업군에 맞춰 표현의 강도와 정보 구조를 다르게 설계합니다.
+              </p>
             </div>
+
+            <Link
+              href="/concept-7/support"
+              className="inline-flex items-center justify-center rounded-full border border-violet-300/16 bg-violet-300/10 px-5 py-3 text-sm font-medium text-violet-200 transition hover:-translate-y-0.5"
+            >
+              문의하러 가기
+            </Link>
+          </div>
+
+          <div className="mt-8 flex flex-wrap gap-3">
+            {sectors.map((item) => (
+              <span
+                key={item}
+                className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/78"
+              >
+                {item}
+              </span>
+            ))}
           </div>
         </div>
       </section>
